@@ -1,4 +1,4 @@
-package com.example.entraverifiedidwallet
+package com.example.entraverifiedidwallet.verifiedid
 
 import android.util.Log
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -16,6 +16,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.entraverifiedidwallet.ui.component.SimpleAlertDialog
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,6 +27,10 @@ fun InputRequirement(onNavigate: () -> Unit, entraClient: EntraClientViewModel) 
     }
     val scope = rememberCoroutineScope()
 
+    var showDialog by remember {
+        mutableStateOf(false)
+    }
+
     Column(
         modifier = Modifier.padding(
             horizontal = 16.dp, vertical = 16.dp
@@ -34,17 +39,32 @@ fun InputRequirement(onNavigate: () -> Unit, entraClient: EntraClientViewModel) 
         TextField(value = pin, onValueChange = { pin = it })
         Button(
             onClick = {
-                Log.d("fuga", pin)
                 scope.launch {
                     entraClient.pinInput(pin).fold(
                         onSuccess = { Log.d("PIN", "Success") },
-                        onFailure = { Log.d("PIN", "Error") }
+                        onFailure = {
+                            Log.d("PIN", "Error")
+                            showDialog = true
+                        }
                     )
                 }
             },
             interactionSource = remember { MutableInteractionSource() },
         ) {
             Text(text = "PIN INPUT")
+        }
+    }
+    when {
+        showDialog -> {
+            SimpleAlertDialog(
+                title = "失敗",
+                message = "不正なPINです",
+                onDismiss = {
+                    showDialog = false
+                },
+                confirmButton = {
+                    showDialog = false
+                })
         }
     }
 }

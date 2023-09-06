@@ -18,6 +18,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.entraverifiedidwallet.ui.theme.EntraVerifiedIDWalletTheme
+import com.example.entraverifiedidwallet.verifiedid.EntraClientViewModel
+import com.example.entraverifiedidwallet.verifiedid.InputRequirement
+import com.example.entraverifiedidwallet.verifiedid.RequestVCUrl
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

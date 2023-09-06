@@ -1,4 +1,4 @@
-package com.example.entraverifiedidwallet
+package com.example.entraverifiedidwallet.verifiedid
 
 import android.content.Context
 import android.net.Uri
