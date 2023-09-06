@@ -20,13 +20,10 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputRequirement(onNavigate: () -> Unit, url: String) {
+fun InputRequirement(onNavigate: () -> Unit, entraClient: EntraClientViewModel) {
     var pin by remember {
         mutableStateOf("")
     }
-
-    val client = entraProvider()
-
     val scope = rememberCoroutineScope()
 
     Column(
@@ -39,19 +36,9 @@ fun InputRequirement(onNavigate: () -> Unit, url: String) {
             onClick = {
                 Log.d("fuga", pin)
                 scope.launch {
-
-                    val result = client.createRequest(url)
-                    result.fold(
-                        onSuccess = {
-                            Log.i(this.toString(), "OK")
-                            client.pinInput(pin).fold(
-                                onSuccess = { Log.d("PIN", "Success") },
-                                onFailure = { Log.d("PIN", "Error") }
-                            )
-                        },
-                        onFailure = {
-                            Log.i(this.toString(), "PIN NG")
-                        }
+                    entraClient.pinInput(pin).fold(
+                        onSuccess = { Log.d("PIN", "Success") },
+                        onFailure = { Log.d("PIN", "Error") }
                     )
                 }
             },

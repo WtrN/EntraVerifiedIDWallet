@@ -6,14 +6,13 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -33,7 +32,6 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-
                     WalletScreen()
                 }
             }
@@ -47,14 +45,23 @@ fun WalletScreen(
     navController: NavHostController = rememberNavController(),
     startDestination: String = "vc",
 ) {
+    val context = LocalContext.current
+
     NavHost(
         navController = navController,
         modifier = modifier,
         startDestination = startDestination
     ) {
-        composable("vc") {
+        composable("vc") { it ->
+            val entraClient: EntraClientViewModel = viewModel(
+                viewModelStoreOwner = it.rememberParentEntry(
+                    navController = navController
+                ),
+                factory = EntraClientViewModel.provideViewModel(context),
+            )
             RequestVCUrl(
-                onNavigate = { navController.navigate("inputPin/${it}") }
+                onNavigate = { navController.navigate("inputPin/${it}") },
+                entraClient = entraClient,
             )
         }
         composable(
@@ -65,32 +72,31 @@ fun WalletScreen(
                     nullable = false
                     defaultValue = ""
                 })
-        ) { entry ->
+        ) { it ->
+            val entraClient: EntraClientViewModel = viewModel(
+                viewModelStoreOwner = it.rememberParentEntry(
+                    navController = navController
+                ),
+                factory = EntraClientViewModel.provideViewModel(context),
+            )
             InputRequirement(
                 onNavigate = { navController.navigate("vc") },
                 url = URLDecoder.decode(
-                    entry.arguments?.getString("url") ?: "",
+                    it.arguments?.getString("url") ?: "",
                     StandardCharsets.UTF_8.toString()
-                )
+                ),
+                entraClient = entraClient,
             )
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    var state by remember {
-        mutableStateOf(9)
-    }
-    Text(
-        text = "Hello $name!", modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    EntraVerifiedIDWalletTheme {
-        Greeting("Android")
+fun NavBackStackEntry.rememberParentEntry(
+    navController: NavController,
+): NavBackStackEntry {
+    val parentId = destination.parent!!.id
+    return remember(this) {
+        navController.getBackStackEntry(parentId)
     }
 }
