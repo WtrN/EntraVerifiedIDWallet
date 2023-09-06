@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RequestVCUrl(
-    onNavigate: (String) -> Unit,
+    onNavigate: () -> Unit,
     entraClient: EntraClientViewModel,
 ) {
     var url by remember {
@@ -44,11 +44,10 @@ fun RequestVCUrl(
                     val result = entraClient.createRequest(url)
                     result.fold(
                         onSuccess = {
-                            val query = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
-                            onNavigate.invoke(query)
+                            onNavigate.invoke()
                         },
                         onFailure = {
-//                            onNavigate.invoke(url)
+                            onNavigate.invoke()
                         }
                     )
                 }

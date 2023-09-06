@@ -48,9 +48,7 @@ fun WalletScreen(
     val context = LocalContext.current
 
     NavHost(
-        navController = navController,
-        modifier = modifier,
-        startDestination = startDestination
+        navController = navController, modifier = modifier, startDestination = startDestination
     ) {
         composable("vc") { it ->
             val entraClient: EntraClientViewModel = viewModel(
@@ -60,18 +58,12 @@ fun WalletScreen(
                 factory = EntraClientViewModel.provideViewModel(context),
             )
             RequestVCUrl(
-                onNavigate = { navController.navigate("inputPin/${it}") },
+                onNavigate = { navController.navigate("inputPin") },
                 entraClient = entraClient,
             )
         }
         composable(
-            "inputPin/{url}", arguments = listOf(
-                navArgument("url") {
-                    // 渡したい値の設定
-                    type = NavType.StringType
-                    nullable = false
-                    defaultValue = ""
-                })
+            "inputPin"
         ) { it ->
             val entraClient: EntraClientViewModel = viewModel(
                 viewModelStoreOwner = it.rememberParentEntry(
@@ -81,10 +73,6 @@ fun WalletScreen(
             )
             InputRequirement(
                 onNavigate = { navController.navigate("vc") },
-                url = URLDecoder.decode(
-                    it.arguments?.getString("url") ?: "",
-                    StandardCharsets.UTF_8.toString()
-                ),
                 entraClient = entraClient,
             )
         }
